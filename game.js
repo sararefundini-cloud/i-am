@@ -35,7 +35,7 @@
     const existing = book.entries.find(entry => entry.ref===ref && entry.motif===motif);
     if (existing) {
       if (text && !existing.lines.includes(text)) existing.lines.push(text);
-      if (!existing.observation && note) existing.observation=note;
+      if (note && note !== existing.observation && !(existing.observation||'').includes(note)) existing.observation = existing.observation ? existing.observation + '\n' + note : note;
     } else {
       book.entries.push({ref,motif,lines:text?[text]:[],observation:note,personal:''});
     }
