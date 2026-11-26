@@ -1,0 +1,1 @@
+Fig Tree: explicit canvas stacking, removed fog and HUD gradient for isolation, render status button. Original chapters and audio preserved. WebGL context unavailable in test environment; no visual pass claimed. No shared-engine refactor performed. Older diagnostics retained.
