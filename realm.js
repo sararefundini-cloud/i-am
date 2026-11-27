@@ -80,7 +80,7 @@
     const rnd = mulberry(seed);
     const c = canvas(256, 256);
     const g = c.getContext('2d');
-    g.fillStyle = '#1a1612';
+    g.fillStyle = '#8a7562';
     g.fillRect(0, 0, 256, 256);
     for (let i = 0; i < 80; i++) {
       g.fillStyle = `rgba(${30 + rnd() * 40},${28 + rnd() * 24},${18 + rnd() * 12},0.35)`;
@@ -102,7 +102,7 @@
     const rnd = mulberry(seed);
     const c = canvas(256, 128);
     const g = c.getContext('2d');
-    g.fillStyle = '#241810';
+    g.fillStyle = '#8d6848';
     g.fillRect(0, 0, 256, 128);
     for (let y = 0; y < 128; y += 2) {
       const v = 20 + Math.sin(y * 0.35) * 10 + rnd() * 12;
@@ -169,7 +169,7 @@
     const rnd = mulberry(4);
     const c = canvas(128, 128);
     const g = c.getContext('2d');
-    g.fillStyle = '#4a3424';
+    g.fillStyle = '#c49662';
     g.fillRect(0, 0, 128, 128);
     for (let i = 0; i < 40; i++) {
       g.fillStyle = `rgba(${20 + rnd() * 40},${12 + rnd() * 20},8,0.35)`;
@@ -244,7 +244,7 @@
       }
     }
     g.fillStyle = '#d7d0c2';
-    g.globalAlpha = 0.82;
+    g.globalAlpha = 0.34;
     g.fillRect(0, 0, 256, 256);
     g.globalAlpha = 1;
     for (let i = 0; i < 18; i++) {
@@ -253,13 +253,15 @@
       g.ellipse(rnd() * 256, rnd() * 256, 8 + rnd() * 28, 4 + rnd() * 10, rnd() * 3, 0, 7);
       g.fill();
     }
-    g.strokeStyle = 'rgba(92,58,38,.45)';
-    g.lineWidth = 2;
+    g.strokeStyle = 'rgba(122,42,36,.85)';
+    g.lineWidth = 4;
     g.beginPath();
     g.moveTo(20, 40);
     g.bezierCurveTo(80, 70, 40, 140, 120, 180);
+    g.lineTo(150, 230);
     g.stroke();
-    g.strokeStyle = 'rgba(70,78,42,.4)';
+    g.strokeStyle = 'rgba(58,92,48,.8)';
+    g.lineWidth = 3;
     g.beginPath();
     g.moveTo(180, 30);
     g.bezierCurveTo(150, 90, 210, 120, 160, 200);
@@ -300,9 +302,9 @@
       t.needsUpdate = true;
       return t;
     }
-    const stoneC = paintStone(3, '#3a342c');
-    const mudC = paintStone(8, '#4a3b30');
-    const prisonC = paintStone(11, '#2a2c30');
+    const stoneC = paintStone(3, '#9a9084');
+    const mudC = paintStone(8, '#8a705c');
+    const prisonC = paintStone(11, '#8e98a2');
     const libTex = {
       stone: tex(stoneC, 2, 2),
       mud: tex(mudC, 2, 2),
@@ -324,19 +326,19 @@
     }, extra || {}));
     lib = {
       T, tex: libTex,
-      stone: M(0xb4aa9c, libTex.stone, 0.86, 0.04),
-      mud: M(0xc4b09a, libTex.mud, 0.9, 0.02),
-      prison: M(0x9aa6b0, libTex.prison, 0.7, 0.12),
-      earth: M(0x3e362e, libTex.earth, 0.9, 0),
-      sand: M(0xc2b39a, libTex.sand, 0.88, 0.02),
-      grass: M(0x3d4634, libTex.grass, 0.96, 0),
-      wood: M(0x5a4030, libTex.wood, 0.84, 0.02),
-      plaster: M(0xcfc6b6, libTex.plaster, 0.94, 0.02),
+      stone: M(0xffffff, libTex.stone, 0.86, 0.04),
+      mud: M(0xffffff, libTex.mud, 0.9, 0.02),
+      prison: M(0xffffff, libTex.prison, 0.72, 0.08),
+      earth: M(0xffffff, libTex.earth, 0.9, 0),
+      sand: M(0xffffff, libTex.sand, 0.88, 0.02),
+      grass: M(0xffffff, libTex.grass, 0.96, 0),
+      wood: M(0xffffff, libTex.wood, 0.82, 0.02),
+      plaster: M(0xffffff, libTex.plaster, 0.92, 0.02),
       water: M(0x163038, libTex.water, 0.22, 0.18, { transparent: true, opacity: 0.86 }),
       cloth: M(0x2a241e, libTex.cloth, 0.9, 0),
       skin: M(0x8a7060, libTex.skin, 0.72, 0.02),
-      bread: M(0x8a6840, libTex.bread, 0.86, 0),
-      metal: M(0x8a8070, libTex.metal, 0.38, 0.62),
+      bread: M(0xffffff, libTex.bread, 0.86, 0),
+      metal: M(0xffffff, libTex.metal, 0.38, 0.32),
       moss: M(0x3e4a32, libTex.grass, 0.9, 0),
       ember: new T.Basic({ color: 0xff9a4a })
     };
@@ -357,7 +359,7 @@
     stats.pr = pr;
     if ('outputColorSpace' in renderer) renderer.outputColorSpace = 'srgb';
     renderer.toneMapping = 4;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.15;
     if (renderer.shadowMap) {
       renderer.shadowMap.enabled = !soft;
       renderer.shadowMap.type = 2;
@@ -481,7 +483,7 @@
       color: 0xffffff,
       map: rippleTex,
       roughness: sea ? 0.18 : 0.1,
-      metalness: sea ? 0.55 : 0.62,
+      metalness: sea ? 0.28 : 0.22,
       transparent: true,
       opacity: 0.94,
       side: 2
@@ -501,13 +503,13 @@
         '#include <emissivemap_fragment>\n' +
         'float g1 = pow(max(sin(gl_FragCoord.x*0.17 + uTime*2.4)*sin(gl_FragCoord.y*0.11 - uTime*1.8), 0.0), 4.0);\n' +
         'float g2 = pow(max(sin(gl_FragCoord.x*0.05 - uTime*0.8 + gl_FragCoord.y*0.04), 0.0), 3.0);\n' +
-        'totalEmissiveRadiance += vec3(0.85, 0.92, 0.95)*g1*1.6;\n' +
-        'totalEmissiveRadiance += vec3(0.35, 0.5, 0.55)*g2;\n'
+        'totalEmissiveRadiance += vec3(0.55, 0.68, 0.72)*g1*0.55;\n' +
+        'totalEmissiveRadiance += vec3(0.22, 0.32, 0.36)*g2*0.35;\n'
       );
     };
     mat.userData.uTime = uTime;
     mat.emissive = new T.Color(sea ? 0x12343c : 0x1a4550);
-    if ('emissiveIntensity' in mat) mat.emissiveIntensity = 0.55;
+    if ('emissiveIntensity' in mat) mat.emissiveIntensity = 0.22;
     const mesh = new T.Mesh(geo, mat);
     const shimmer = new T.Mesh(geo, new T.Basic({
       map: rippleTex,
@@ -664,9 +666,19 @@
     return pts;
   }
 
-  function clothMat(color, rough, metal) {
+  function clothMat(color, rough, metal, emissive) {
     const T = window.T;
-    return new T.Material({ color, roughness: rough, metalness: metal || 0 });
+    const mat = new T.Material({ color, roughness: rough, metalness: Math.min(metal || 0, 0.32) });
+    if (emissive) {
+      mat.emissive = new T.Color(emissive);
+      if ('emissiveIntensity' in mat) mat.emissiveIntensity = 0.4;
+    }
+    return mat;
+  }
+
+  function linearFog(hex, near, far) {
+    const T = window.T;
+    return { isFog: true, name: '', color: new T.Color(hex), near: near, far: far };
   }
 
   function addPerson(parent, kind) {
@@ -679,7 +691,7 @@
     const ash = clothMat(0x9ca0a4, 0.78, 0.04);
     const slate = clothMat(0x4e5358, 0.74, 0.08);
     const robe = clothMat(0x2b2f34, 0.84, 0.06);
-    const pewter = clothMat(0x6d6a66, 0.32, 0.78);
+    const pewter = clothMat(0xb7b2aa, 0.32, 0.32, 0x4a4742);
     const oxblood = clothMat(0x8e2c38, 0.42, 0.12);
     const skin = clothMat(0xc8c2ba, 0.62, 0.02);
     if (!priest) {
@@ -730,7 +742,7 @@
     const jewels = [0x6d6a66, 0x5c4048, 0x4a5560, 0x6a5348, 0x555e58, 0x704048, 0x5a5a62, 0x6d5a52, 0x455058, 0x624848, 0x585860, 0x6a6058];
     for (let row = 0; row < 4; row++) {
       for (let col = 0; col < 3; col++) {
-        const gem = new T.Mesh(new T.Sphere(0.028, 6, 4), clothMat(jewels[row * 3 + col], 0.22, 0.65));
+        const gem = new T.Mesh(new T.Sphere(0.028, 6, 4), clothMat(jewels[row * 3 + col], 0.28, 0.22, jewels[row * 3 + col]));
         gem.position.set(-0.07 + col * 0.07, 1.28 - row * 0.07, 0.23);
         g.add(gem);
       }
@@ -766,7 +778,7 @@
       const setting = new T.Mesh(new T.Box(0.11, 0.025, 0.09), pewter);
       setting.position.set(side * 0.22, 1.4, 0.1);
       g.add(setting);
-      const onyx = new T.Mesh(new T.Box(0.08, 0.055, 0.065), clothMat(0x141618, 0.16, 0.62));
+      const onyx = new T.Mesh(new T.Box(0.08, 0.055, 0.065), clothMat(0x2a2e32, 0.22, 0.3, 0x15181c));
       onyx.position.set(side * 0.22, 1.45, 0.1);
       g.add(onyx);
     }
@@ -961,10 +973,13 @@
       const theme = THEME[mode] || THEME.room;
       world = new T.Scene();
       world.background = new T.Color(theme.bg);
-      world.fog = new T.Fog(theme.fog, theme.near, theme.far);
-      world.add(new T.Hemisphere(theme.sky, theme.ground, theme.hemi));
-      const moon = new T.Directional(theme.moon, theme.moonI);
-      moon.position.set(-7, 11, 4);
+      world.fog = theme.outside ? linearFog(theme.fog, 12, 58) : linearFog(theme.fog, 22, 70);
+      world.add(new T.Hemisphere(theme.sky, theme.ground, 0.85));
+      const moon = new T.Directional(theme.moon, 3.2);
+      moon.position.set(8, 12, 5);
+      const rim = new T.Directional(theme.outside ? 0xc5d6e2 : 0xffc090, 1.55);
+      rim.position.set(-9, 5, -6);
+      world.add(rim);
       if (!soft && renderer.shadowMap.enabled) {
         moon.castShadow = true;
         moon.shadow.mapSize.set(512, 512);
@@ -972,13 +987,13 @@
         sc.left = -14; sc.right = 14; sc.top = 14; sc.bottom = -14; sc.near = 1; sc.far = 30;
       }
       world.add(moon);
-      const warm = new T.Point(theme.warm, theme.warmI, theme.outside ? 28 : 18, 1.4);
+      const warm = new T.Point(theme.warm, theme.outside ? 12 : 22, 0, 1);
       warm.position.set((map[0].length || 8) * 0.45, theme.outside ? 1.6 : 1.9, (map.length || 8) * 0.55);
       world.add(warm);
       world.userData.warm = warm;
       world.userData.warmBase = soft ? theme.warmI * 0.55 : theme.warmI;
       world.userData.mode = mode;
-      const floorMat = new T.Basic({ color: theme.outside ? 0xb5a78f : (mode === 'room' ? 0x6d8494 : mode === 'prison' ? 0x6a7278 : 0x6a5c4c) });
+      const floorMat = L[theme.floor] || L.earth;
       const wallMat = L[theme.wall] || L.stone;
       for (const run of floorRuns(map)) {
         box(world, run.x + run.len / 2, -0.08, run.y + 0.5, run.len, 0.16, 1, floorMat);
@@ -1035,30 +1050,42 @@
       }
       if (theme.sea) {
         const w = map[0].length, h = map.length;
-        const bow = curve({ x: w - 1.2, y: 0.35, z: h / 2 }, { x: w + 4.2, y: 1.15, z: h / 2 }, { x: w + 1.2, y: 0.2, z: h / 2 }, 10);
-        world.add(new T.Mesh(tubeGeometry(bow, t => 0.16 + (1 - t) * 0.34, 8), L.wood));
-        for (const side of [-1, 1]) {
-          const gun = curve(
-            { x: 1.2, y: 0.85, z: h / 2 + side * 1.35 },
-            { x: w + 2.4, y: 1.05, z: h / 2 + side * 0.35 },
-            { x: w * 0.55, y: 0.7, z: h / 2 + side * 1.55 },
-            8
-          );
-          world.add(new T.Mesh(tubeGeometry(gun, () => 0.08, 6), L.wood));
-          const oar = curve(
-            { x: 4.2, y: 0.95, z: h / 2 + side * 0.4 },
-            { x: 6.4, y: 0.15, z: h / 2 + side * 3.2 },
-            { x: 5.2, y: 0.72, z: h / 2 + side * 1.6 },
+        const mid = h / 2;
+        box(world, 4.2, 0.46, mid, 0.55, 0.1, 1.7, L.wood);
+        box(world, 7.6, 0.46, mid, 0.55, 0.1, 1.7, L.wood);
+        for (let i = 0; i < 5; i++) {
+          const rib = curve(
+            { x: 3.4 + i * 1.7, y: 0.12, z: mid - 1.35 },
+            { x: 3.4 + i * 1.7, y: 0.12, z: mid + 1.35 },
+            { x: 3.4 + i * 1.7, y: 0.72, z: mid },
             6
           );
-          world.add(new T.Mesh(tubeGeometry(oar, t => 0.045 - t * 0.02, 5), L.wood));
+          world.add(new T.Mesh(tubeGeometry(rib, () => 0.055, 5), L.wood));
         }
-        const loaf = new T.Mesh(new T.Sphere(0.16, 8, 6), L.bread);
-        loaf.scale.set(1.3, 0.45, 0.8);
-        loaf.position.set(6.2, 0.72, h / 2);
+        const bow = curve({ x: 9.2, y: 0.55, z: mid }, { x: 15.4, y: 2.25, z: mid }, { x: 12.2, y: 0.85, z: mid }, 12);
+        world.add(new T.Mesh(tubeGeometry(bow, t => 0.2 + (1 - t) * 0.32, 8), L.wood));
+        for (const side of [-1, 1]) {
+          const gun = curve(
+            { x: 2.4, y: 0.95, z: mid + side * 1.45 },
+            { x: 13.6, y: 1.85, z: mid + side * 0.28 },
+            { x: 8.2, y: 0.82, z: mid + side * 1.6 },
+            10
+          );
+          world.add(new T.Mesh(tubeGeometry(gun, () => 0.09, 6), L.wood));
+          const oar = curve(
+            { x: 5.1, y: 0.82, z: mid + side * 0.2 },
+            { x: 7.4, y: 0.02, z: mid + side * 2.7 },
+            { x: 6.1, y: 0.48, z: mid + side * 1.35 },
+            6
+          );
+          world.add(new T.Mesh(tubeGeometry(oar, t => 0.055 - t * 0.02, 5), L.wood));
+        }
+        const loaf = new T.Mesh(new T.Sphere(0.18, 8, 6), L.bread);
+        loaf.scale.set(1.45, 0.5, 0.9);
+        loaf.position.set(4.2, 0.64, mid + 0.15);
         world.add(loaf);
-        const beacon = new T.Point(0xfff2d2, 18, 40, 1.2);
-        beacon.position.set(w * 0.5, 2.4, -8);
+        const beacon = new T.Point(0xfff2d2, 14, 0, 1);
+        beacon.position.set(w * 0.35, 3.4, -16);
         world.add(beacon);
         const glow = new T.Mesh(new T.Sphere(0.35, 8, 6), new T.Basic({ color: 0xfff6dd }));
         glow.position.copy(beacon.position);
@@ -1249,8 +1276,8 @@
         if (item && item.offset) item.offset.x = ((t || 0) * 0.08) % 1;
       }
       if (themeName === 'boat') {
-        cam.position.y += Math.sin((t || 0) * 0.85) * 0.07;
-        cam.position.x += Math.sin((t || 0) * 0.37) * 0.04;
+        cam.position.y = 1.28 + Math.sin((t || 0) * 0.85) * 0.04;
+        cam.lookAt(p.x + Math.cos(p.a) * 4, 0.95, p.y + Math.sin(p.a) * 4);
       }
       if (world.userData.mode === 'dwelling' && world.userData.warm) {
         const flick = 0.78 + Math.sin((t || 0) * 11) * 0.1 + Math.sin((t || 0) * 23.5) * 0.07;
