@@ -122,7 +122,10 @@
       '#iam-act,#iam-veins{position:fixed;right:calc(16px + env(safe-area-inset-right));pointer-events:auto;touch-action:none;border:1px solid rgba(214,196,150,.55);background:rgba(16,13,10,.72);color:#f0e6d2;font:600 15px/1 Georgia,serif;letter-spacing:.14em;border-radius:46px}',
       '#iam-act{bottom:calc(22px + env(safe-area-inset-bottom));width:92px;height:92px}',
       '#iam-veins{bottom:calc(126px + env(safe-area-inset-bottom));width:92px;height:64px;letter-spacing:.12em}',
-      '#touch .arrows,#touch #use,#buttons [data-k],#controls{display:none!important}'
+      '#touch .arrows,#touch #use,#buttons [data-k],#controls,#scan,#figdiag,#figreport{display:none!important}',
+      '#mute,#replay,button[aria-label="Toggle environmental sound effects"]{top:8px!important;left:8px!important;right:auto!important;bottom:auto!important;z-index:70}',
+      '#iam-refrain{top:28%}',
+      '#next{position:fixed;top:12px;left:50%;transform:translateX(-50%);bottom:auto!important;z-index:70}'
     ].join('');
     document.head.appendChild(style);
     const root = document.createElement('div');

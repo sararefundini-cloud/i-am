@@ -320,15 +320,15 @@
       metal: tex(paintMetal(), 1, 1)
     };
     const M = (color, map, rough, metal, extra) => new T.Material(Object.assign({
-      color, map, roughness: rough, metalness: metal || 0
+      color, map, roughness: rough, metalness: metal || 0, side: 2
     }, extra || {}));
     lib = {
       T, tex: libTex,
-      stone: M(0x6a655c, libTex.stone, 0.92, 0.04),
-      mud: M(0x6e5a48, libTex.mud, 0.96, 0.02),
-      prison: M(0x4a4e54, libTex.prison, 0.72, 0.12),
-      earth: M(0x5c5044, libTex.earth, 0.98, 0),
-      sand: M(0x6a5c48, libTex.sand, 0.94, 0.02),
+      stone: M(0xb4aa9c, libTex.stone, 0.86, 0.04),
+      mud: M(0xc4b09a, libTex.mud, 0.9, 0.02),
+      prison: M(0x9aa6b0, libTex.prison, 0.7, 0.12),
+      earth: M(0x3e362e, libTex.earth, 0.9, 0),
+      sand: M(0xc2b39a, libTex.sand, 0.88, 0.02),
       grass: M(0x3d4634, libTex.grass, 0.96, 0),
       wood: M(0x5a4030, libTex.wood, 0.84, 0.02),
       plaster: M(0xcfc6b6, libTex.plaster, 0.94, 0.02),
@@ -357,7 +357,7 @@
     stats.pr = pr;
     if ('outputColorSpace' in renderer) renderer.outputColorSpace = 'srgb';
     renderer.toneMapping = 4;
-    renderer.toneMappingExposure = soft ? 1.02 : 0.94;
+    renderer.toneMappingExposure = 1.08;
     if (renderer.shadowMap) {
       renderer.shadowMap.enabled = !soft;
       renderer.shadowMap.type = 2;
@@ -407,7 +407,7 @@
     }
     const style = document.createElement('style');
     style.id = 'iam-grade';
-    style.textContent = '#iam-vignette{position:fixed;inset:0;pointer-events:none;z-index:6;background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.78) 100%)}#iam-grain{position:fixed;inset:-30%;pointer-events:none;z-index:7;opacity:.13;mix-blend-mode:overlay;background:url(' + grainURL + ');animation:iamgrain .7s steps(2) infinite}@keyframes iamgrain{50%{transform:translate(-3%,2%)}}';
+    style.textContent = '#iam-vignette{position:fixed;inset:0;pointer-events:none;z-index:6;background:radial-gradient(ellipse at center,transparent 78%,rgba(0,0,0,.18) 100%)}#iam-grain{position:fixed;inset:-30%;pointer-events:none;z-index:7;opacity:.05;mix-blend-mode:overlay;background:url(' + grainURL + ');animation:iamgrain .7s steps(2) infinite}@keyframes iamgrain{50%{transform:translate(-3%,2%)}}';
     document.head.appendChild(style);
     const v = document.createElement('div');
     v.id = 'iam-vignette';
@@ -664,51 +664,173 @@
     return pts;
   }
 
+  function clothMat(color, rough, metal) {
+    const T = window.T;
+    return new T.Material({ color, roughness: rough, metalness: metal || 0 });
+  }
+
   function addPerson(parent, kind) {
-    const L = library();
-    const T = L.T;
+    const T = window.T;
     const g = new T.Group();
     parent.add(g);
-    const scale = kind === 'boy' ? 0.74 : kind === 'woman' ? 0.95 : 1;
+    const priest = kind === 'priest' || kind === 'baptist' || kind === 'person' || !kind;
+    const scale = kind === 'boy' ? 0.72 : kind === 'woman' ? 0.94 : kind === 'leper' ? 0.88 : 1;
     g.scale.setScalar(scale);
-    const robePts = [];
-    for (let i = 0; i <= 9; i++) {
-      const t = i / 9;
-      robePts.push({
-        x: Math.sin(t * 3.1) * 0.05 + t * 0.02,
-        y: 0.05 + t * 1.35,
-        z: Math.sin(t * 2.2) * 0.04
-      });
+    const ash = clothMat(0x9ca0a4, 0.78, 0.04);
+    const slate = clothMat(0x4e5358, 0.74, 0.08);
+    const robe = clothMat(0x2b2f34, 0.84, 0.06);
+    const pewter = clothMat(0x6d6a66, 0.32, 0.78);
+    const oxblood = clothMat(0x8e2c38, 0.42, 0.12);
+    const skin = clothMat(0xc8c2ba, 0.62, 0.02);
+    if (!priest) {
+      const skirt = [];
+      for (let i = 0; i <= 10; i++) {
+        const t = i / 10;
+        skirt.push({ x: 0, y: t * 1.35, z: Math.sin(t * Math.PI) * 0.04 });
+      }
+      g.add(new T.Mesh(tubeGeometry(skirt, t => 0.42 - t * 0.2, 8), robe));
+      g.rotation.x = kind === 'leper' ? 0.22 : 0.06;
+      return g;
     }
-    const robe = new T.Mesh(tubeGeometry(robePts, t => 0.22 + Math.sin(t * Math.PI) * 0.08 - t * 0.06, 8), L.cloth);
-    g.add(robe);
-    const head = new T.Mesh(new T.Sphere(0.15, 12, 9), L.skin);
-    head.position.set(0.02, 1.52, 0.03);
-    head.scale.set(0.86, 1.08, 0.92);
-    g.add(head);
-    const hood = new T.Mesh(new T.Sphere(0.2, 10, 8), L.cloth);
-    hood.position.set(0.01, 1.56, -0.02);
-    hood.scale.set(1.05, 0.85, 1.1);
-    g.add(hood);
+    const tunic = [];
+    for (let i = 0; i <= 8; i++) {
+      const t = i / 8;
+      tunic.push({ x: 0, y: 0.02 + t * 1.55, z: 0 });
+    }
+    g.add(new T.Mesh(tubeGeometry(tunic, t => 0.16 + (t < 0.15 ? 0.06 : 0), 8), ash));
     for (const side of [-1, 1]) {
-      const arm = curve(
-        { x: side * 0.18, y: 1.2, z: 0 },
-        { x: side * 0.28, y: 0.62, z: 0.06 },
-        { x: side * 0.34, y: 0.95, z: 0.02 },
+      const sleeve = curve(
+        { x: side * 0.16, y: 1.28, z: 0 },
+        { x: side * 0.34, y: 0.72, z: 0.06 },
+        { x: side * 0.28, y: 1.02, z: 0.02 },
         5
       );
-      g.add(new T.Mesh(tubeGeometry(arm, () => 0.045, 5), L.cloth));
-      const hand = new T.Mesh(new T.Sphere(0.045, 6, 5), L.skin);
-      hand.position.set(side * 0.28, 0.58, 0.08);
-      g.add(hand);
+      g.add(new T.Mesh(tubeGeometry(sleeve, () => 0.055, 6), ash));
     }
-    const eyeMat = new T.Basic({ color: 0x0c0a09 });
+    const pleats = [];
+    for (let i = 0; i <= 14; i++) {
+      const t = i / 14;
+      pleats.push({ x: Math.sin(t * 2) * 0.02, y: t * 1.48, z: 0.02 });
+    }
+    g.add(new T.Mesh(tubeGeometry(pleats, t => 0.34 + Math.sin(t * Math.PI) * 0.08 - t * 0.06, 10), robe));
+    const ephod = [];
+    for (let i = 0; i <= 6; i++) {
+      const t = i / 6;
+      ephod.push({ x: 0, y: 0.72 + t * 0.62, z: 0.1 });
+    }
+    const ephodMesh = new T.Mesh(tubeGeometry(ephod, () => 0.2, 6), slate);
+    ephodMesh.scale.set(1.15, 1, 0.55);
+    g.add(ephodMesh);
+    const sash = new T.Mesh(new T.Cylinder(0.2, 0.2, 0.08, 8), slate);
+    sash.position.set(0, 0.95, 0.08);
+    g.add(sash);
+    const plate = new T.Mesh(new T.Box(0.28, 0.34, 0.045), pewter);
+    plate.position.set(0, 1.18, 0.2);
+    g.add(plate);
+    const jewels = [0x6d6a66, 0x5c4048, 0x4a5560, 0x6a5348, 0x555e58, 0x704048, 0x5a5a62, 0x6d5a52, 0x455058, 0x624848, 0x585860, 0x6a6058];
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 3; col++) {
+        const gem = new T.Mesh(new T.Sphere(0.028, 6, 4), clothMat(jewels[row * 3 + col], 0.22, 0.65));
+        gem.position.set(-0.07 + col * 0.07, 1.28 - row * 0.07, 0.23);
+        g.add(gem);
+      }
+    }
     for (const side of [-1, 1]) {
-      const eye = new T.Mesh(new T.Sphere(0.018, 5, 4), eyeMat);
-      eye.position.set(side * 0.045, 1.54, 0.13);
+      const chain = curve(
+        { x: side * 0.12, y: 1.32, z: 0.18 },
+        { x: side * 0.16, y: 1.48, z: 0.06 },
+        { x: side * 0.18, y: 1.4, z: 0.12 },
+        3
+      );
+      g.add(new T.Mesh(tubeGeometry(chain, () => 0.012, 4), pewter));
+    }
+    const nHem = 10;
+    for (let i = 0; i < nHem; i++) {
+      const a = (i / nHem) * Math.PI * 2;
+      const hx = Math.cos(a) * 0.46;
+      const hz = Math.sin(a) * 0.46;
+      if (i % 2 === 0) {
+        const fruit = new T.Mesh(new T.Sphere(0.11, 8, 6), oxblood);
+        fruit.position.set(hx, 0.32, hz);
+        g.add(fruit);
+        const crown = new T.Mesh(new T.Cylinder(0.015, 0.07, 0.07, 5), oxblood);
+        crown.position.set(hx, 0.44, hz);
+        g.add(crown);
+      } else {
+        const bell = new T.Mesh(new T.Cylinder(0.025, 0.07, 0.12, 6), pewter);
+        bell.position.set(hx, 0.3, hz);
+        g.add(bell);
+      }
+    }
+    for (const side of [-1, 1]) {
+      const setting = new T.Mesh(new T.Box(0.11, 0.025, 0.09), pewter);
+      setting.position.set(side * 0.22, 1.4, 0.1);
+      g.add(setting);
+      const onyx = new T.Mesh(new T.Box(0.08, 0.055, 0.065), clothMat(0x141618, 0.16, 0.62));
+      onyx.position.set(side * 0.22, 1.45, 0.1);
+      g.add(onyx);
+    }
+    const pivot = new T.Group();
+    pivot.position.set(0.38, 0.86, 0.14);
+    g.add(pivot);
+    pivot.add(new T.Mesh(tubeGeometry(curve({ x: 0, y: 0, z: 0 }, { x: 0.04, y: -0.55, z: 0.02 }, { x: 0.1, y: -0.28, z: 0 }, 4), () => 0.012, 4), pewter));
+    const bowl = new T.Mesh(new T.Sphere(0.07, 8, 6), pewter);
+    bowl.scale.y = 0.65;
+    bowl.position.set(0.05, -0.58, 0.03);
+    pivot.add(bowl);
+    const smokeMat = new T.Basic({ color: 0xd5d8da, transparent: true, opacity: 0.35, depthWrite: false });
+    const wisps = [];
+    for (let i = 0; i < 4; i++) {
+      const wisp = new T.Mesh(new T.Sphere(0.03, 5, 4), smokeMat);
+      wisp.position.set(0.05, -0.48, 0.03);
+      pivot.add(wisp);
+      wisps.push(wisp);
+    }
+    for (const side of [-1, 1]) {
+      const foot = new T.Mesh(new T.Box(0.07, 0.045, 0.16), skin);
+      foot.position.set(side * 0.09, 0.03, 0.34);
+      g.add(foot);
+    }
+    const tunicHem = new T.Mesh(new T.Cylinder(0.2, 0.22, 0.08, 8), ash);
+    tunicHem.position.set(0, 0.1, 0.08);
+    g.add(tunicHem);
+    (function swing() {
+      const t = performance.now() * 0.001;
+      pivot.rotation.z = Math.sin(t * 1.4) * 0.45;
+      wisps.forEach((wisp, i) => {
+        const u = (t * 0.35 + i * 0.25) % 1;
+        wisp.position.y = -0.48 + u * 0.55;
+        wisp.position.x = 0.05 + Math.sin(t + i) * 0.03;
+        wisp.scale.setScalar(0.6 + u);
+      });
+      requestAnimationFrame(swing);
+    })();
+    const head = new T.Mesh(new T.Box(0.13, 0.2, 0.11), skin);
+    head.position.set(0, 1.62, 0.04);
+    g.add(head);
+    const brow = new T.Mesh(new T.Box(0.15, 0.035, 0.06), clothMat(0x8e8880, 0.7, 0));
+    brow.position.set(0, 1.7, 0.09);
+    g.add(brow);
+    const socket = new T.Basic({ color: 0x100e0c });
+    const glint = new T.Basic({ color: 0xd8c090 });
+    for (const side of [-1, 1]) {
+      const pit = new T.Mesh(new T.Box(0.03, 0.02, 0.02), socket);
+      pit.position.set(side * 0.035, 1.64, 0.1);
+      g.add(pit);
+      const eye = new T.Mesh(new T.Sphere(0.008, 4, 3), glint);
+      eye.position.set(side * 0.035, 1.64, 0.112);
       g.add(eye);
     }
-    g.rotation.y = (hash(scale * 10) - 0.5) * 0.6;
+    const mitre = new T.Mesh(new T.Cylinder(0.1, 0.12, 0.16, 8), ash);
+    mitre.position.set(0, 1.82, 0.02);
+    g.add(mitre);
+    const wrap = new T.Mesh(new T.Cylinder(0.125, 0.125, 0.05, 8), ash);
+    wrap.position.set(0, 1.74, 0.02);
+    g.add(wrap);
+    const frontlet = new T.Mesh(new T.Box(0.08, 0.035, 0.015), pewter);
+    frontlet.position.set(0, 1.76, 0.13);
+    g.add(frontlet);
+    g.rotation.y = 0.15;
     return g;
   }
 
@@ -796,14 +918,14 @@
   }
 
   const THEME = {
-    dwelling: { outside: false, h: 2.28, ceil: 2.32, floor: 'earth', wall: 'plaster', fog: 0x12100c, bg: 0x0a0907, near: 3.5, far: 14, sky: 0x1c1812, ground: 0x0c0a08, hemi: 0.22, moon: 0x8a7660, moonI: 0.35, warm: 0xff9a48, warmI: 6.2 },
-    river: { outside: true, h: 0.55, floor: 'sand', wall: 'stone', fog: 0x1a2428, bg: 0x101820, near: 8, far: 36, sky: 0x243848, ground: 0x1a1812, hemi: 0.55, moon: 0xd5e4ee, moonI: 1.35, warm: 0xffc090, warmI: 2.2, water: true },
-    prison: { outside: false, h: 2.35, ceil: 2.28, floor: 'prison', wall: 'prison', fog: 0x070708, bg: 0x040404, near: 2.2, far: 9.5, sky: 0x12141a, ground: 0x050505, hemi: 0.12, moon: 0x667088, moonI: 0.28, warm: 0xc46a32, warmI: 4.2, bars: true },
-    room: { outside: false, h: 2.65, ceil: 2.75, floor: 'earth', wall: 'mud', fog: 0x120e0c, bg: 0x0a0908, near: 4, far: 17, sky: 0x221810, ground: 0x0c0907, hemi: 0.26, moon: 0x887060, moonI: 0.48, warm: 0xff7a32, warmI: 8 },
-    desert: { outside: true, h: 0.38, floor: 'sand', wall: 'stone', fog: 0x14110e, bg: 0x0c0b0a, near: 6, far: 26, sky: 0x2a241c, ground: 0x100e0a, hemi: 0.34, moon: 0xc2b29a, moonI: 0.7, warm: 0xffa060, warmI: 2 },
-    field: { outside: true, h: 0.34, floor: 'grass', wall: 'stone', fog: 0x10140f, bg: 0x0a0e0c, near: 6, far: 24, sky: 0x1c241c, ground: 0x0c100c, hemi: 0.32, moon: 0xa8b098, moonI: 0.62, warm: 0xffb060, warmI: 2.4 },
-    boat: { outside: true, h: 0.9, floor: 'wood', wall: 'wood', fog: 0x121820, bg: 0x0c1218, near: 6, far: 28, sky: 0x1c3040, ground: 0x10141a, hemi: 0.42, moon: 0xc5d6e4, moonI: 1.15, warm: 0xffb080, warmI: 1.4, water: true, sea: true },
-    water: { outside: true, h: 0.42, floor: 'sand', wall: 'stone', fog: 0x0c1216, bg: 0x070a0e, near: 5, far: 22, sky: 0x1a2838, ground: 0x0a0c08, hemi: 0.38, moon: 0x9bb0c8, moonI: 0.85, warm: 0xffb070, warmI: 3.5, water: true }
+    dwelling: { outside: false, h: 2.45, ceil: 2.55, floor: 'earth', wall: 'plaster', fog: 0xc8bfb2, bg: 0xb7aea2, near: 40, far: 80, sky: 0xfff4e8, ground: 0xa89078, hemi: 0.95, moon: 0xfff6ea, moonI: 0.7, warm: 0xffaa50, warmI: 14 },
+    river: { outside: true, h: 0.7, floor: 'sand', wall: 'stone', fog: 0xc5cdd0, bg: 0xd5dee2, near: 40, far: 100, sky: 0xeef3f6, ground: 0xb0a898, hemi: 1.05, moon: 0xffffff, moonI: 0.9, warm: 0xffe0c0, warmI: 4, water: true },
+    prison: { outside: false, h: 2.45, ceil: 2.4, floor: 'prison', wall: 'prison', fog: 0xb0b8be, bg: 0x9aa4aa, near: 36, far: 70, sky: 0xe4eef4, ground: 0x8a949c, hemi: 0.9, moon: 0xeef4f8, moonI: 0.65, warm: 0xffc080, warmI: 10, bars: true },
+    room: { outside: false, h: 3.4, ceil: 3.6, floor: 'prison', wall: 'prison', fog: 0xb7c6d0, bg: 0x9eb0bc, near: 40, far: 80, sky: 0xe4eef4, ground: 0x7e94a6, hemi: 1.0, moon: 0xe8f0f4, moonI: 0.85, warm: 0xd8d4cc, warmI: 6 },
+    desert: { outside: true, h: 0.38, floor: 'sand', wall: 'stone', fog: 0xd8d0c4, bg: 0xe4dcc8, near: 36, far: 80, sky: 0xf6efe2, ground: 0xc4b49a, hemi: 1.05, moon: 0xfff4e4, moonI: 0.9, warm: 0xffd0a0, warmI: 4 },
+    field: { outside: true, h: 0.34, floor: 'grass', wall: 'stone', fog: 0xc8d2c4, bg: 0xd5e0d0, near: 36, far: 80, sky: 0xeef4ea, ground: 0xa8b8a0, hemi: 1.05, moon: 0xf4f8f2, moonI: 0.85, warm: 0xffe0b8, warmI: 4 },
+    boat: { outside: true, h: 1.05, floor: 'wood', wall: 'wood', fog: 0xc8cec8, bg: 0xd5dbd5, near: 36, far: 80, sky: 0xeef2ee, ground: 0xa8aea4, hemi: 1.0, moon: 0xf7faf6, moonI: 0.85, warm: 0xfff0d8, warmI: 5, water: true, sea: true },
+    water: { outside: true, h: 0.42, floor: 'sand', wall: 'stone', fog: 0xc5cdd0, bg: 0xd5dee2, near: 36, far: 90, sky: 0xeef3f6, ground: 0xb0a898, hemi: 1.05, moon: 0xffffff, moonI: 0.9, warm: 0xffe0c0, warmI: 4, water: true }
   };
 
   function makeWorld(canvas) {
@@ -850,13 +972,13 @@
         sc.left = -14; sc.right = 14; sc.top = 14; sc.bottom = -14; sc.near = 1; sc.far = 30;
       }
       world.add(moon);
-      const warm = new T.Point(theme.warm, soft ? theme.warmI * 0.55 : theme.warmI, 9, 2);
+      const warm = new T.Point(theme.warm, theme.warmI, theme.outside ? 28 : 18, 1.4);
       warm.position.set((map[0].length || 8) * 0.45, theme.outside ? 1.6 : 1.9, (map.length || 8) * 0.55);
       world.add(warm);
       world.userData.warm = warm;
       world.userData.warmBase = soft ? theme.warmI * 0.55 : theme.warmI;
       world.userData.mode = mode;
-      const floorMat = L[theme.floor] || L.earth;
+      const floorMat = new T.Basic({ color: theme.outside ? 0xb5a78f : (mode === 'room' ? 0x6d8494 : mode === 'prison' ? 0x6a7278 : 0x6a5c4c) });
       const wallMat = L[theme.wall] || L.stone;
       for (const run of floorRuns(map)) {
         box(world, run.x + run.len / 2, -0.08, run.y + 0.5, run.len, 0.16, 1, floorMat);
@@ -911,6 +1033,37 @@
         shaft.position.set(map[0].length * 0.48, theme.ceil * 0.45, map.length * 0.42);
         world.add(shaft);
       }
+      if (theme.sea) {
+        const w = map[0].length, h = map.length;
+        const bow = curve({ x: w - 1.2, y: 0.35, z: h / 2 }, { x: w + 4.2, y: 1.15, z: h / 2 }, { x: w + 1.2, y: 0.2, z: h / 2 }, 10);
+        world.add(new T.Mesh(tubeGeometry(bow, t => 0.16 + (1 - t) * 0.34, 8), L.wood));
+        for (const side of [-1, 1]) {
+          const gun = curve(
+            { x: 1.2, y: 0.85, z: h / 2 + side * 1.35 },
+            { x: w + 2.4, y: 1.05, z: h / 2 + side * 0.35 },
+            { x: w * 0.55, y: 0.7, z: h / 2 + side * 1.55 },
+            8
+          );
+          world.add(new T.Mesh(tubeGeometry(gun, () => 0.08, 6), L.wood));
+          const oar = curve(
+            { x: 4.2, y: 0.95, z: h / 2 + side * 0.4 },
+            { x: 6.4, y: 0.15, z: h / 2 + side * 3.2 },
+            { x: 5.2, y: 0.72, z: h / 2 + side * 1.6 },
+            6
+          );
+          world.add(new T.Mesh(tubeGeometry(oar, t => 0.045 - t * 0.02, 5), L.wood));
+        }
+        const loaf = new T.Mesh(new T.Sphere(0.16, 8, 6), L.bread);
+        loaf.scale.set(1.3, 0.45, 0.8);
+        loaf.position.set(6.2, 0.72, h / 2);
+        world.add(loaf);
+        const beacon = new T.Point(0xfff2d2, 18, 40, 1.2);
+        beacon.position.set(w * 0.5, 2.4, -8);
+        world.add(beacon);
+        const glow = new T.Mesh(new T.Sphere(0.35, 8, 6), new T.Basic({ color: 0xfff6dd }));
+        glow.position.copy(beacon.position);
+        world.add(glow);
+      }
       if (theme.bars) {
         for (let i = 0; i < 7; i++) {
           const bar = new T.Mesh(new T.Cylinder(0.035, 0.035, 2.1, 6), L.metal);
@@ -932,13 +1085,50 @@
         }
       }
       if (mode === 'room') {
-        const oven = new T.Mesh(new T.Cylinder(0.55, 0.7, 0.7, 10), L.mud);
-        oven.position.set(3.2, 0.35, 2.4);
-        world.add(oven);
-        const glow = new T.Mesh(new T.Sphere(0.16, 8, 6), L.ember);
-        glow.position.set(3.2, 0.55, 2.85);
-        world.add(glow);
-        box(world, 8.2, 0.28, 3.2, 0.42, 0.56, 0.42, L.mud);
+        const len = map[0].length;
+        const mid = map.length * 0.5;
+        box(world, len * 0.48, 0.42, mid, len * 0.55, 0.08, 1.15, L.wood);
+        for (let i = 0; i < 6; i++) {
+          const loaf = new T.Mesh(new T.Sphere(0.11, 6, 4), L.bread);
+          loaf.scale.set(1.2, 0.45, 0.85);
+          loaf.position.set(2.4 + i * 1.3, 0.55, mid + (i % 2 ? 0.18 : -0.12));
+          world.add(loaf);
+        }
+        for (let i = 0; i < 3; i++) {
+          const jar = new T.Mesh(new T.Cylinder(0.1, 0.14, 0.28, 6), L.prison);
+          jar.position.set(3 + i * 2.4, 0.58, mid - 0.28);
+          world.add(jar);
+        }
+        for (let i = 0; i < 4; i++) {
+          const arch = curve(
+            { x: 2 + i * 2.6, y: 2.1, z: mid - 2.2 },
+            { x: 2 + i * 2.6, y: 2.1, z: mid + 2.2 },
+            { x: 2 + i * 2.6, y: 3.35, z: mid },
+            8
+          );
+          world.add(new T.Mesh(tubeGeometry(arch, () => 0.1, 6), L.prison));
+        }
+        const hearth = new T.Mesh(new T.Box(0.4, 1.6, 2.2), L.prison);
+        hearth.position.set(len - 1.2, 0.8, mid);
+        world.add(hearth);
+        const mouth = new T.Mesh(new T.Box(0.2, 0.7, 1.1), new T.Basic({ color: 0x2a3036 }));
+        mouth.position.set(len - 1.45, 0.7, mid);
+        world.add(mouth);
+        const ember = new T.Mesh(new T.Sphere(0.12, 6, 4), new T.Basic({ color: 0xb9b3aa }));
+        ember.position.set(len - 1.35, 0.35, mid);
+        world.add(ember);
+        warm.position.set(len * 0.45, 2.6, mid);
+        const keeper = new T.Group();
+        keeper.position.set(4.2, 0, mid + 1.6);
+        world.add(keeper);
+        addPerson(keeper, 'priest');
+      }
+      if (mode === 'dwelling' || mode === 'river') {
+        const keeper = new T.Group();
+        keeper.position.set(mode === 'dwelling' ? 4.8 : 6.4, 0, mode === 'dwelling' ? 5.7 : 3.6);
+        keeper.rotation.y = mode === 'river' ? Math.PI : 0;
+        world.add(keeper);
+        addPerson(keeper, 'priest');
       }
       if (mode === 'river' || mode === 'water') {
         const span = map[0].length;
@@ -1082,6 +1272,7 @@
         stats.triangles = info.triangles;
       }
       stats.mode = themeName;
+      stats.pos = [Math.round(p.x*10)/10, Math.round(p.y*10)/10, Math.round((p.a||0)*100)/100];
       adapt(renderer, dt * 1000);
     };
   }
