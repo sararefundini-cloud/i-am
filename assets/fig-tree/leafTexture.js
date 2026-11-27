@@ -38,19 +38,22 @@ function createLeafGeometry() {
   geo.computeVertexNormals();
   return geo;
 }
-async function createFigLeaves(anisotropy = 8) {
-  const [map, back, normal, roughness, thickness] = await Promise.all([
+function loadFigLeafMaps(anisotropy = 8) {
+  return Promise.all([
     loadMap(ALBEDO, true, anisotropy),
     loadMap(BACK, true, anisotropy),
     loadMap(NORMAL, false, anisotropy),
     loadMap(ROUGH, false, anisotropy),
     loadMap(THICK, false, anisotropy)
-  ]);
-  const variation = { map, back, normal, roughness, thickness };
+  ]).then(([map, back, normal, roughness, thickness]) => ({ map, back, normal, roughness, thickness }));
+}
+async function createFigLeaves(anisotropy = 8) {
+  const variation = await loadFigLeafMaps(anisotropy);
   return { geo: createLeafGeometry(), variations: [variation] };
 }
 export {
   LEAF_CENTER_FRACTION,
   createFigLeaves,
-  createLeafGeometry
+  createLeafGeometry,
+  loadFigLeafMaps
 };
